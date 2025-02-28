@@ -36,7 +36,7 @@ declare module 'alasql' {
 
 	// compiled Statement
 	interface AlaSQLStatement {
-		<T = unknown>(params?: Record<string, unknown>, cb?: AlaSQLCallback<T>, scope?: unknown): T;
+		<T = unknown>(params?: any, cb?: AlaSQLCallback<T>, scope?: unknown): T;
 	}
 
 	// abstract Syntax Tree
@@ -146,7 +146,7 @@ declare module 'alasql' {
 		sqlCacheSize: number;
 		astCache: {[key: string]: unknown};
 		resetSqlCache(): void;
-		exec<T = unknown>(sql: string, params?: Record<string, unknown>, cb?: AlaSQLCallback<T>): T;
+		exec<T = unknown>(sql: string, params?: any, cb?: AlaSQLCallback<T>): T;
 		autoval(tablename: string, colname: string, getNext: boolean): unknown;
 	}
 
