@@ -194,7 +194,7 @@ yy.Select.prototype.compilePivot = function (query) {
 			}
 		}
 		// Provide a fallback if still not found
-		aggColDef = aggColDef || { columnid: exprcolid, dbtypeid: 'OBJECT' };
+		aggColDef = aggColDef || {columnid: exprcolid, dbtypeid: 'OBJECT'};
 
 		// Keep only the grouping columns initially
 		query.columns = query.columns.filter(function (col) {
