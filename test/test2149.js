@@ -5,7 +5,7 @@ if (typeof exports === 'object') {
 	var path = require('path');
 }
 
-describe('Test CLI - Command Line Interface - Issue #2149 (Pipe handling with txt())', function () {
+describe('Test CLI - Command Line Interface)', function () {
 	console.log(__dirname);
 	const cliPath = path.join(__dirname, '..', 'bin', 'alasql-cli.js');
 	const testSqlFile = path.join(__dirname, 'temp-test.sql');
