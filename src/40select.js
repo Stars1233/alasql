@@ -501,6 +501,13 @@ function modify(query, res) {
 		} else {
 			// Cannot recognize columns
 			columns = [];
+			if (query && query.sources) {
+				query.sources.forEach(source => {
+					if (source && source.columns && Array.isArray(source.columns)) {
+						columns = columns.concat(source.columns);
+					}
+				});
+			}
 		}
 	}
 
