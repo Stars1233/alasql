@@ -59,6 +59,12 @@ yy.Insert.prototype.toJS = function (context, tableid, defcols) {
 
 yy.Insert.prototype.compile = function (databaseid) {
 	var self = this;
+
+	// Handle ParamValue (anonymous data table) - wrap execution
+	if (self.into instanceof yy.ParamValue) {
+		return yy.compileParamValue(self.into.param, 'INSERT', true, databaseid, self, 'into');
+	}
+
 	databaseid = self.into.databaseid || databaseid;
 	var db = alasql.databases[databaseid];
 	//	console.log(self);

@@ -40,6 +40,12 @@ yy.SetColumn.prototype.toString = function () {
 yy.Update.prototype.compile = function (databaseid) {
 	var self = this;
 	//	console.log(this);
+
+	// Handle ParamValue (anonymous data table) - wrap execution
+	if (this.table instanceof yy.ParamValue) {
+		return yy.compileParamValue(this.table.param, 'UPDATE', false, databaseid, self, 'table');
+	}
+
 	databaseid = this.table.databaseid || databaseid;
 	var tableid = this.table.tableid;
 
