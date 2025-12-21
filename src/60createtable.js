@@ -166,21 +166,21 @@ yy.CreateTable.prototype.execute = function (databaseid, params, cb) {
 						throw new Error('FOREIGN KEY allowed only to tables with PRIMARY KEYs');
 					}
 				}
+				// Store foreignkey property in column for later access
+				newcol.foreignkey = {
+					tableid: fk.tableid,
+					columnid: fk.columnid,
+				};
 				var fkfn = function (r) {
 					var rr = {};
-					// Allow NULL values in foreign keys (check for undefined, null, and NaN)
 					var val = r[col.columnid];
-					if (
-						typeof val === 'undefined' ||
-						val === null ||
-						(typeof val === 'number' && isNaN(val))
-					) {
-						return true;
-					}
-					rr[fk.columnid] = val;
-					var addr = fktable.pk.onrightfn(rr);
-					if (!fktable.uniqs[fktable.pk.hh][addr]) {
-						throw new Error('Foreign key "' + val + '" not found in table "' + fk.tableid + '"');
+					// Only check foreign key if value is not null, undefined, or NaN
+					if (val != null && !(typeof val === 'number' && isNaN(val))) {
+						rr[fk.columnid] = val;
+						var addr = fktable.pk.onrightfn(rr);
+						if (!fktable.uniqs[fktable.pk.hh][addr]) {
+							throw new Error('Foreign key "' + val + '" not found in table "' + fk.tableid + '"');
+						}
 					}
 					return true;
 				};
@@ -215,6 +215,12 @@ yy.CreateTable.prototype.execute = function (databaseid, params, cb) {
 			pk.onrightfn = new Function('r', 'var y;return ' + pk.onrightfns);
 			pk.hh = hash(pk.onrightfns);
 			table.uniqs[pk.hh] = {};
+			// Mark columns with primarykey property
+			pk.columns.forEach(function (columnid) {
+				if (table.xcolumns[columnid]) {
+					table.xcolumns[columnid].primarykey = true;
+				}
+			});
 		} else if (con.type === 'CHECK') {
 			checkfn = new Function('r,params,alasql', 'var y;return ' + con.expression.toJS('r', ''));
 		} else if (con.type === 'UNIQUE') {
@@ -247,13 +253,26 @@ yy.CreateTable.prototype.execute = function (databaseid, params, cb) {
 				throw new Error('Invalid foreign key on table ' + table.tableid);
 			}
 
+			// Mark columns with foreignkey property
+			fk.columns.forEach(function (columnid, i) {
+				if (table.xcolumns[columnid]) {
+					table.xcolumns[columnid].foreignkey = {
+						tableid: fk.tableid,
+						columnid: fk.fkcolumns[i],
+						constraintid: con.constraintid,
+					};
+				}
+			});
+
 			checkfn = function (r) {
 				var rr = {};
 
 				//Composite foreign keys
 				fk.fkcolumns.forEach(function (colFk, i) {
-					if (r[fk.columns[i]] != null) {
-						rr[colFk] = r[fk.columns[i]];
+					var val = r[fk.columns[i]];
+					// Only include non-null, non-undefined, non-NaN values
+					if (val != null && !(typeof val === 'number' && isNaN(val))) {
+						rr[colFk] = val;
 					}
 				});
 
