@@ -363,6 +363,8 @@ Literal
 		{ $$ = $1.toLowerCase(); }
 	| OPEN
 		{ $$ = $1.toLowerCase(); }
+	| CLOSE
+		{ $$ = $1.toLowerCase(); }
 	| error NonReserved
 		{ $$ = $2.toLowerCase() }
 	;
@@ -3195,6 +3197,7 @@ NonReserved
 	|CHARACTER_SET_NAME
 	|CHARACTER_SET_SCHEMA
 	|CLASS_ORIGIN
+	|CLOSE
 	|COBOL
 	|COLLATION
 	|COLLATION_CATALOG
@@ -3472,6 +3475,7 @@ var nonReserved = ["A"
 	,"CHARACTER_SET_NAME"
 	,"CHARACTER_SET_SCHEMA"
 	,"CLASS_ORIGIN"
+	,"CLOSE"
 	,"COBOL"
 	,"COLLATION"
 	,"COLLATION_CATALOG"
