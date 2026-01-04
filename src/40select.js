@@ -301,12 +301,19 @@ yy.Select = class Select {
 									cb
 								);`;
 				} else {
-					// Into AlaSQL tables
-					query.intofns = `alasql
-							.databases[${JSON.stringify(this.into.databaseid || databaseid)}]
-							.tables[${JSON.stringify(this.into.tableid)}]
-							.data.push(r);
-						`;
+					// Into AlaSQL tables - convert types based on column definitions
+					var dbid = this.into.databaseid || databaseid;
+					var tblid = this.into.tableid;
+					query.intofns = `
+						var db = alasql.databases[${JSON.stringify(dbid)}];
+						var table = db.tables[${JSON.stringify(tblid)}];
+						var converted = {};
+						for (var key in r) {
+							var colDef = table.xcolumns && table.xcolumns[key];
+							converted[key] = alasql.utils.typeConverter(r[key], colDef ? colDef.dbtypeid : null);
+						}
+						table.data.push(converted);
+					`;
 				}
 			} else if (this.into instanceof yy.VarValue) {
 				//
