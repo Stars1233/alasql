@@ -473,6 +473,31 @@ yy.Select.prototype.compileSelect2 = function (query, params) {
 
 yy.Select.prototype.compileSelectGroup0 = function (query) {
 	var self = this;
+
+	// Optimization: Build lookup structures upfront to avoid O(n*m) complexity in the main loop
+	// Only build these if GROUP BY exists, as they're only used for alias resolution
+	var groupByAliasMap = null;
+	var selectColumnNames = null;
+
+	if (self.group) {
+		// Build map of GROUP BY columns that reference aliases (for O(1) lookup)
+		groupByAliasMap = {};
+		self.group.forEach(function (gp, idx) {
+			if (gp instanceof yy.Column && gp.columnid && !gp.tableid) {
+				groupByAliasMap[gp.columnid] = idx;
+			}
+		});
+
+		// Build set of actual column names in SELECT to distinguish pure aliases from column renames
+		// This prevents incorrect replacement of "GROUP BY b" when "SELECT a AS b, b AS c" exists
+		selectColumnNames = {};
+		self.columns.forEach(function (col) {
+			if (col instanceof yy.Column && col.columnid) {
+				selectColumnNames[col.columnid] = true;
+			}
+		});
+	}
+
 	self.columns.forEach(function (col, idx) {
 		if (!(col instanceof yy.Column && col.columnid === '*')) {
 			var colas;
@@ -493,11 +518,34 @@ yy.Select.prototype.compileSelectGroup0 = function (query) {
 			col.nick = colas;
 
 			if (self.group) {
+				// Match GROUP BY columns to SELECT columns by columnid and tableid (for real columns)
 				var groupIdx = self.group.findIndex(function (gp) {
 					return gp.columnid === col.columnid && gp.tableid === col.tableid;
 				});
 				if (groupIdx > -1) {
 					self.group[groupIdx].nick = colas;
+				}
+
+				// Also match GROUP BY columns that reference SELECT column aliases
+				// This handles cases like: SELECT CASE ... END AS age_group ... GROUP BY age_group
+				// Only apply if:
+				// 1. The SELECT column has an alias
+				// 2. That alias matches a GROUP BY column name
+				// 3. The alias is NOT an actual column name (pure alias, not renaming)
+				if (
+					col.as &&
+					groupByAliasMap &&
+					groupByAliasMap.hasOwnProperty(col.as) &&
+					!selectColumnNames[col.as]
+				) {
+					var aliasGroupIdx = groupByAliasMap[col.as];
+					// Replace the GROUP BY column reference with a deep copy of the SELECT expression
+					// We use deep cloning to ensure nested objects (like CASE whens/elses) are copied
+					var groupExpr = cloneDeep(col);
+					// Clear SELECT-specific properties that shouldn't be in GROUP BY
+					delete groupExpr.as;
+					groupExpr.nick = colas;
+					self.group[aliasGroupIdx] = groupExpr;
 				}
 			}
 
