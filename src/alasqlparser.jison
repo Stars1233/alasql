@@ -1462,6 +1462,7 @@ Aggregator
 	| AGGR { $$ = "AGGR"; }
 	| ARRAY { $$ = "ARRAY"; }
 	| GROUP_CONCAT { $$ = "GROUP_CONCAT"; }
+	| CORR { $$ = "CORR"; }
 /*	| REDUCE { $$ = "REDUCE"; } */
 	;
 
@@ -1474,7 +1475,7 @@ FuncValue
 					$$ = new yy.FuncValue({funcid: funcid, args: exprlist, over: $6});
 			} else if(alasql.aggr[$1]) {
 		    	$$ = new yy.AggrValue({aggregatorid: 'REDUCE',
-                      funcid: funcid, expression: exprlist.pop(),distinct:($3=='DISTINCT'), over: $6 });
+                      funcid: funcid, expression: exprlist[0], args: exprlist, distinct:($3=='DISTINCT'), over: $6 });
 		    } else {
 			    $$ = new yy.FuncValue({funcid: funcid, args: exprlist, over: $6});
 			};

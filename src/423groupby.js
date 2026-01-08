@@ -164,7 +164,15 @@ yy.Select.prototype.compileGroup = function (query) {
 					} else if (col.aggregatorid === 'REDUCE') {
 						query.aggrKeys.push(col);
 						const extraParams = getGroupConcatParams(col);
-						return `'${colas}':alasql.aggr['${col.funcid}'](${colexp},undefined,1${extraParams}),`;
+						// Support multiple arguments for user-defined aggregates
+						if (col.args && col.args.length > 1) {
+							// Multiple arguments - pass all of them
+							let argExpressions = col.args.map(arg => arg.toJS('p', tableid, defcols)).join(',');
+							return `'${colas}':alasql.aggr['${col.funcid}'](${argExpressions},undefined,1${extraParams}),`;
+						} else {
+							// Single argument - backward compatibility
+							return `'${colas}':alasql.aggr['${col.funcid}'](${colexp},undefined,1${extraParams}),`;
+						}
 					}
 					return '';
 				}
@@ -435,11 +443,20 @@ yy.Select.prototype.compileGroup = function (query) {
 							${post}`;
 					} else if (col.aggregatorid === 'REDUCE') {
 						const extraParams = getGroupConcatParams(col);
-						return `${pre}
-							g['${colas}'] = alasql.aggr.${col.funcid}(${colexp},g['${colas}'],2${extraParams});
-							${post}`;
+						// Support multiple arguments for user-defined aggregates
+						if (col.args && col.args.length > 1) {
+							// Multiple arguments - pass all of them
+							let argExpressions = col.args.map(arg => arg.toJS('p', tableid, defcols)).join(',');
+							return `${pre}
+								g['${colas}'] = alasql.aggr.${col.funcid}(${argExpressions},g['${colas}'],2${extraParams});
+								${post}`;
+						} else {
+							// Single argument - backward compatibility
+							return `${pre}
+								g['${colas}'] = alasql.aggr.${col.funcid}(${colexp},g['${colas}'],2${extraParams});
+								${post}`;
+						}
 					}
-
 					return '';
 				}
 
