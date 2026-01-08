@@ -1128,28 +1128,87 @@ UnionClause
 
 UnionOp
 	: UNION
-		{ $$ = {op: 'union'}; }
+		{ 
+			// Save and reset queries for nested SELECT using stack pattern
+			if(!yy.queriesStack) yy.queriesStack = [];
+			yy.queriesStack.push(yy.queries || []);
+			yy.queries = [];
+			$$ = {op: 'union'}; 
+		}
 	| UNION ALL
-		{ $$ = {op: 'unionall'}; }
+		{ 
+			if(!yy.queriesStack) yy.queriesStack = [];
+			yy.queriesStack.push(yy.queries || []);
+			yy.queries = [];
+			$$ = {op: 'unionall'}; 
+		}
 	| EXCEPT
-		{ $$ = {op: 'except'}; }
+		{ 
+			if(!yy.queriesStack) yy.queriesStack = [];
+			yy.queriesStack.push(yy.queries || []);
+			yy.queries = [];
+			$$ = {op: 'except'}; 
+		}
 	| INTERSECT
-		{ $$ = {op: 'intersect'}; }
+		{ 
+			if(!yy.queriesStack) yy.queriesStack = [];
+			yy.queriesStack.push(yy.queries || []);
+			yy.queries = [];
+			$$ = {op: 'intersect'}; 
+		}
 	| UNION CORRESPONDING
-		{ $$ = {op: 'union', corresponding: true}; }
+		{ 
+			if(!yy.queriesStack) yy.queriesStack = [];
+			yy.queriesStack.push(yy.queries || []);
+			yy.queries = [];
+			$$ = {op: 'union', corresponding: true}; 
+		}
 	| UNION ALL CORRESPONDING
-		{ $$ = {op: 'unionall', corresponding: true}; }
+		{ 
+			if(!yy.queriesStack) yy.queriesStack = [];
+			yy.queriesStack.push(yy.queries || []);
+			yy.queries = [];
+			$$ = {op: 'unionall', corresponding: true}; 
+		}
 	| EXCEPT CORRESPONDING
-		{ $$ = {op: 'except', corresponding: true}; }
+		{ 
+			if(!yy.queriesStack) yy.queriesStack = [];
+			yy.queriesStack.push(yy.queries || []);
+			yy.queries = [];
+			$$ = {op: 'except', corresponding: true}; 
+		}
 	| INTERSECT CORRESPONDING
-		{ $$ = {op: 'intersect', corresponding: true}; }
+		{ 
+			if(!yy.queriesStack) yy.queriesStack = [];
+			yy.queriesStack.push(yy.queries || []);
+			yy.queries = [];
+			$$ = {op: 'intersect', corresponding: true}; 
+		}
 	;
 
 UnionableSelect
 	: SelectWithoutOrderOrLimit
-		{ $$ = $1; }
+		{
+			// Restore parent queries from stack and assign current queries to nested SELECT
+			if(yy.queriesStack && yy.queriesStack.length > 0) {
+				if(yy.queries && yy.queries.length > 0) {
+					$1.queries = yy.queries;
+				}
+				yy.queries = yy.queriesStack.pop();
+			}
+			$$ = $1;
+		}
 	| ParenthesizedSelect
-		{ $$ = $1; }
+		{
+			// Restore parent queries from stack and assign current queries to nested SELECT
+			if(yy.queriesStack && yy.queriesStack.length > 0) {
+				if(yy.queries && yy.queries.length > 0) {
+					$1.queries = yy.queries;
+				}
+				yy.queries = yy.queriesStack.pop();
+			}
+			$$ = $1;
+		}
 	;
 
 OrderClause
