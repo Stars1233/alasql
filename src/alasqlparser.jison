@@ -1521,7 +1521,6 @@ Aggregator
 	| AGGR { $$ = "AGGR"; }
 	| ARRAY { $$ = "ARRAY"; }
 	| GROUP_CONCAT { $$ = "GROUP_CONCAT"; }
-	| CORR { $$ = "CORR"; }
 /*	| REDUCE { $$ = "REDUCE"; } */
 	;
 
