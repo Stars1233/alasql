@@ -12,7 +12,9 @@ permissions:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'blacksmith-4vcpu-ubuntu-2204' }}
+    # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+    # runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'blacksmith-4vcpu-ubuntu-2204' }}
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
       actions: read

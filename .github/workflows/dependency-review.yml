@@ -14,7 +14,9 @@ permissions:
 
 jobs:
   dependency-review:
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+    # runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1

@@ -13,7 +13,9 @@ jobs:
     name: Verify code formatting
     permissions:
       contents: read
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+    # runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
@@ -23,7 +25,9 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node
-        uses: useblacksmith/setup-node@65c6ca86fdeb0ab3d85e78f57e4f6a7e4780b391 # v5.0.4
+        # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+        # uses: useblacksmith/setup-node@65c6ca86fdeb0ab3d85e78f57e4f6a7e4780b391 # v5.0.4
+        uses: actions/setup-node@v4
         with:
           node-version: '24.x'
 
@@ -38,7 +42,9 @@ jobs:
     needs: []
     permissions:
       contents: write
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+    # runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
@@ -48,7 +54,9 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node
-        uses: useblacksmith/setup-node@65c6ca86fdeb0ab3d85e78f57e4f6a7e4780b391 # v5.0.4
+        # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+        # uses: useblacksmith/setup-node@65c6ca86fdeb0ab3d85e78f57e4f6a7e4780b391 # v5.0.4
+        uses: actions/setup-node@v4
         with:
           node-version: '24.x'
 
@@ -76,7 +84,9 @@ jobs:
     permissions:
       contents: read
     needs: [build, verify-formatting]
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+    # runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [16.x, 18.x, 20.x, 22.x, 24.x] # Dropped '23.x' (EOL) and 'latest' for stability
@@ -89,7 +99,9 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node
-        uses: useblacksmith/setup-node@65c6ca86fdeb0ab3d85e78f57e4f6a7e4780b391 # v5.0.4
+        # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+        # uses: useblacksmith/setup-node@65c6ca86fdeb0ab3d85e78f57e4f6a7e4780b391 # v5.0.4
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -114,7 +126,9 @@ jobs:
     permissions:
       contents: read
     needs: [build, verify-formatting]
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+    # runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
@@ -139,7 +153,9 @@ jobs:
     needs: []
     permissions:
       contents: read
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    # Blacksmith is much faster and gives better dashboards than github actions, but we are not being sponsored anymore so had to revert. 
+    # runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
