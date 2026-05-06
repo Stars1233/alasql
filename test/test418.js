@@ -71,7 +71,7 @@ describe('Test ' + test + ' Load data from internet', function () {
 		var url = baseUrl + '/test/test157.json';
 
 		it('Load http', function (done) {
-			this.timeout(2000);
+			this.timeout(10000);
 			testRequest(3, 'http://' + url, 'false', done);
 		});
 
